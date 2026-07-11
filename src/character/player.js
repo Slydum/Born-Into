@@ -4,6 +4,7 @@ import { tileAt, isWalkable } from '../engine/grid.js';
 import { agentById, ageOf, householdOf, dist } from '../agents/npc.js';
 import { buildingAt, getBuilding } from '../world/townGen.js';
 import { adjustRel, getRel, relScore } from '../agents/relationships.js';
+import { enterBuilding } from '../agents/parentAI.js';
 import { addStat, playerStats } from './stats.js';
 import { checkReveals, traitMod } from './traits.js';
 import { logMsg, toast } from '../ui/hud.js';
@@ -38,7 +39,7 @@ export function updatePlayer(game, dt) {
   if (!p || p.flags.dead) return;
   const mod = stageMod(game);
 
-  if (mod.canMove && !p.carriedBy && !p.inside) {
+  if (mod.canMove && !p.carriedBy && !p.inside && !(p.path && p.path.length)) {
     movePlayer(game, p, dt, mod);
   }
   if (mod.update) mod.update(game, dt);
@@ -53,11 +54,12 @@ export function updatePlayer(game, dt) {
 function autoEnterIfArrived(game, p) {
   if (!p.autoEnterBuilding || p.inside || (p.path && p.path.length)) return;
   const b = getBuilding(game.state, p.autoEnterBuilding);
-  p.autoEnterBuilding = null;
-  if (!b) return;
-  if (Math.round(p.x) === b.door.x && Math.round(p.y) === b.exit.y) {
-    p.inside = b.id;
-    p.x = b.door.x; p.y = b.door.y;
+  if (!b) { p.autoEnterBuilding = null; return; }
+  // same fuzzy tolerance parentAI uses for NPC arrival, so a stray sub-tile
+  // nudge from player input doesn't defeat the match and strand the flag
+  if (Math.round(p.x) === b.door.x && Math.abs(p.y - b.exit.y) <= 1.2) {
+    p.autoEnterBuilding = null;
+    enterBuilding(game, p, b);
     game.ui.openPanel(b);
   }
 }
@@ -92,8 +94,7 @@ function movePlayer(game, p, dt, mod) {
     const b = buildingAt(game.state, tx, ty);
     const age = ageOf(game.state, p);
     if (b && age >= 5) {
-      p.inside = b.id;
-      p.x = b.door.x; p.y = b.door.y;
+      enterBuilding(game, p, b);
       game.ui.openPanel(b);
     } else if (b) {
       p.y = b.exit.y; // toddlers bounce off

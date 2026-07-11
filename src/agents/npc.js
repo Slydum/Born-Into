@@ -71,8 +71,20 @@ export function createAgent(state, opts) {
   return a;
 }
 
+// agentById is called from many per-agent, per-frame update paths; a plain
+// .find() scan would make the sim O(n^2) as agents accumulate across
+// generations. Cache a Map per state object, invalidated by size so it
+// stays correct across pushes (agents are never removed from the array)
+// and self-resets when game.state is replaced wholesale on load.
+const agentIndexCache = new WeakMap();
 export function agentById(state, id) {
-  return state.agents.find(a => a.id === id) || null;
+  let idx = agentIndexCache.get(state);
+  if (!idx || idx.size !== state.agents.length) {
+    idx = new Map();
+    for (const a of state.agents) idx.set(a.id, a);
+    agentIndexCache.set(state, idx);
+  }
+  return idx.get(id) || null;
 }
 
 export function ageOf(state, a) {

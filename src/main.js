@@ -404,8 +404,13 @@ function switchToHeir(child) {
   };
   st.playerData = pd;
   const age = ageOf(st, child);
-  setStage(game, stageForAge(age).id);
-  if (age >= 18) game.assignCareer();
+  if (age >= 18) {
+    // heir ages directly into adulthood, skipping the interactive teen
+    // education fork — pick a track from their rolled curiosity so
+    // pickCareer() doesn't fall back to the tier-0 default forever
+    pd.education = ks.curiosity >= 45 ? 'college' : 'parttime';
+  }
+  setStage(game, stageForAge(age).id); // adult.js's enter() assigns the career since pd.job is null
   checkReveals(game);
   logMsg(game, `Generation ${st.flags.generation}: you are ${child.name} now, age ${age}. Your childhood already happened — you were shaped by it.`, true);
   toast(`You continue as ${child.name}.`);

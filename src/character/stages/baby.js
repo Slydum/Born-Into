@@ -43,7 +43,7 @@ export function update(game, dt) {
       pd.neglectWarned = true;
       logMsg(game, 'You are hungry, wet, and alone. Someone at the clinic makes a phone call.', true);
     }
-    if (pd.neglectTimer > 22 && (st.flags.swCooldown || 0) <= st.simSec) {
+    if (hh && pd.neglectTimer > 22 && (st.flags.swCooldown || 0) <= st.simSec) {
       st.flags.swCooldown = st.simSec + 90;
       dispatchSocialWorker(game, hh.id, 'neglect');
     }

@@ -53,7 +53,7 @@ export function actions(game) {
       label: `Go to work (${pd.job.title}, $${pd.job.wage}/h)`, key: 'G',
       fn: () => {
         const b = getBuilding(st, pd.job.buildingId);
-        gotoTile(game, p, b.door.x, b.exit.y);
+        if (gotoTile(game, p, b.door.x, b.exit.y)) p.autoEnterBuilding = b.id;
       },
     });
   }

@@ -42,6 +42,24 @@ export function updatePlayer(game, dt) {
     movePlayer(game, p, dt, mod);
   }
   if (mod.update) mod.update(game, dt);
+  autoEnterIfArrived(game, p);
+}
+
+// "Walk to school" / "Go to work" path you to the tile just outside a civic
+// door, one step short of actually entering — otherwise you'd have to nudge
+// yourself onto the door tile in exactly the right direction afterward,
+// which is fiddly at the best of times and easy to get stuck on with a
+// touch d-pad. Once you arrive, step the rest of the way in automatically.
+function autoEnterIfArrived(game, p) {
+  if (!p.autoEnterBuilding || p.inside || (p.path && p.path.length)) return;
+  const b = getBuilding(game.state, p.autoEnterBuilding);
+  p.autoEnterBuilding = null;
+  if (!b) return;
+  if (Math.round(p.x) === b.door.x && Math.round(p.y) === b.exit.y) {
+    p.inside = b.id;
+    p.x = b.door.x; p.y = b.door.y;
+    game.ui.openPanel(b);
+  }
 }
 
 function movePlayer(game, p, dt, mod) {

@@ -74,7 +74,7 @@ export function actions(game) {
       fn: () => {
         const school = getBuilding(st, 'school');
         if (gotoTile(game, p, school.door.x, school.exit.y)) {
-          p.autoSchool = true;
+          p.autoEnterBuilding = school.id;
           logMsg(game, 'You head for school.');
         }
       },

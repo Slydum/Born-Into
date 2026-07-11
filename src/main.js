@@ -679,7 +679,15 @@ function setupInput() {
   if (dpad) {
     for (const btn of dpad.querySelectorAll('.dbtn')) {
       const dx = +btn.dataset.dx, dy = +btn.dataset.dy;
-      const press = (e) => { e.preventDefault(); touch.x = dx; touch.y = dy; updateAxis(); };
+      const press = (e) => {
+        e.preventDefault();
+        // capture the pointer so a real finger's natural jitter can't slip
+        // outside the 46px button and fire pointerleave mid-hold — without
+        // this, holding the d-pad down on an actual touchscreen randomly
+        // cancels movement almost immediately
+        btn.setPointerCapture(e.pointerId);
+        touch.x = dx; touch.y = dy; updateAxis();
+      };
       const release = (e) => {
         e.preventDefault();
         if (touch.x === dx && touch.y === dy) { touch.x = 0; touch.y = 0; }

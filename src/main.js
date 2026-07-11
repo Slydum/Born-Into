@@ -5,7 +5,7 @@ import { REAL_SEC_PER_HOUR, stageForAge, clamp, isSchoolDay, T } from './constan
 import { makeRng, hashStr } from './engine/rng.js';
 import { blockKey } from './engine/grid.js';
 import { initSprites } from './engine/sprites.js';
-import { initRenderer, render } from './engine/renderer.js';
+import { initRenderer, render, screenToWorld } from './engine/renderer.js';
 import { saveGame, loadSave, clearSave } from './engine/save.js';
 import { generateTown, getBuilding, vacantHouses } from './world/townGen.js';
 import { furnitureIn } from './world/houseGen.js';
@@ -27,6 +27,7 @@ import { livingChildrenOf, describeHeir } from './family/familyTree.js';
 import { dailyPregnancyTick } from './family/pregnancy.js';
 import { initHud, updateHud, logMsg, toast } from './ui/hud.js';
 import { initChoiceUI, showChoice, openPanel, closePanel, refreshPanel } from './ui/choiceMenu.js';
+import { showAgentInfo, showSelfInfo } from './ui/inspect.js';
 
 const game = {
   state: null,
@@ -53,6 +54,8 @@ async function boot() {
   initRenderer(document.getElementById('game'));
   initHud();
   initChoiceUI(game);
+  game.ui.showAgentInfo = (a) => showAgentInfo(game, a);
+  game.ui.showSelfInfo = () => showSelfInfo(game);
   attachGameMethods();
 
   const saved = loadSave();
@@ -67,6 +70,7 @@ async function boot() {
   }
 
   setupInput();
+  setupPointer();
   setInterval(() => { if (game.state) saveGame(game); }, 12000);
   window.addEventListener('beforeunload', () => saveGame(game));
   document.addEventListener('visibilitychange', () => { if (document.hidden) saveGame(game); });
@@ -207,7 +211,7 @@ function newGame(seed) {
   setStage(game, 'baby');
   logMsg(game, `${st.town.name}. A ${['small', 'modest', 'comfortable'][house.tier]} house on the ${['west', 'middle', 'east'][Math.min(2, house.tier)]} side of town.`, true);
   logMsg(game, `You are born to ${mom.name}${dad ? ' and ' + dad.name : ' — she is raising you alone'}.`, true);
-  toast(`Born Into — you are ${player.name}. Press C to cry. Your parents' rolled traits will do the rest.`);
+  toast(`Born Into — you are ${player.name}. Press C to cry. Tap your parents on screen to see who they are.`);
   saveGame(game);
 }
 
@@ -662,10 +666,32 @@ function npcDeath(a, aAge) {
 // ------------------------------------------------------------------ input
 function setupInput() {
   const keys = {};
+  const touch = { x: 0, y: 0 };
   const updateAxis = () => {
-    game.input.x = (keys['arrowright'] || keys['d'] ? 1 : 0) - (keys['arrowleft'] || keys['a'] ? 1 : 0);
-    game.input.y = (keys['arrowdown'] || keys['s'] ? 1 : 0) - (keys['arrowup'] || keys['w'] ? 1 : 0);
+    const kx = (keys['arrowright'] || keys['d'] ? 1 : 0) - (keys['arrowleft'] || keys['a'] ? 1 : 0);
+    const ky = (keys['arrowdown'] || keys['s'] ? 1 : 0) - (keys['arrowup'] || keys['w'] ? 1 : 0);
+    game.input.x = kx || touch.x;
+    game.input.y = ky || touch.y;
   };
+
+  // on-screen d-pad for touch/mobile — mirrors the arrow-key axis
+  const dpad = document.getElementById('dpad');
+  if (dpad) {
+    for (const btn of dpad.querySelectorAll('.dbtn')) {
+      const dx = +btn.dataset.dx, dy = +btn.dataset.dy;
+      const press = (e) => { e.preventDefault(); touch.x = dx; touch.y = dy; updateAxis(); };
+      const release = (e) => {
+        e.preventDefault();
+        if (touch.x === dx && touch.y === dy) { touch.x = 0; touch.y = 0; }
+        updateAxis();
+      };
+      btn.addEventListener('pointerdown', press);
+      btn.addEventListener('pointerup', release);
+      btn.addEventListener('pointercancel', release);
+      btn.addEventListener('pointerleave', release);
+    }
+  }
+
   window.addEventListener('keydown', (e) => {
     const k = e.key.toLowerCase();
     if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(k) || ['arrowup', 'arrowdown'].includes(k)) e.preventDefault();
@@ -687,6 +713,39 @@ function setupInput() {
     keys[e.key.toLowerCase()] = false;
     updateAxis();
   });
+}
+
+// Tap/click on the canvas: pick whoever's standing near that spot (yourself
+// included) and show who they are. Works from a distance — you don't have
+// to be a mobile character able to walk up and press E, which matters for
+// babies/toddlers and for mobile players with no keyboard.
+function setupPointer() {
+  const canvas = document.getElementById('game');
+  let down = null;
+  canvas.addEventListener('pointerdown', (e) => { down = { x: e.clientX, y: e.clientY }; });
+  canvas.addEventListener('pointerup', (e) => {
+    const start = down;
+    down = null;
+    if (!start || !game.state || game.modalPause) return;
+    if (Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) return; // was a drag, not a tap
+    const rect = canvas.getBoundingClientRect();
+    const { x: wx, y: wy } = screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
+    const a = agentAtWorld(game, wx, wy);
+    if (!a) return;
+    if (a.id === game.state.playerId) showSelfInfo(game);
+    else showAgentInfo(game, a);
+  });
+}
+
+function agentAtWorld(game, wx, wy) {
+  const st = game.state;
+  let best = null, bestD = 0.9;
+  for (const a of st.agents) {
+    if (a.flags.dead || a.inside || a.carriedBy) continue;
+    const d = Math.hypot(a.x + 0.5 - wx, a.y + 0.6 - wy);
+    if (d < bestD) { best = a; bestD = d; }
+  }
+  return best;
 }
 
 // debug helpers for development/testing

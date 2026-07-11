@@ -54,8 +54,15 @@ function movePlayer(game, p, dt, mod) {
 
   const tryAxis = (nx, ny) => {
     const tx = Math.round(nx), ty = Math.round(ny);
-    if (!isWalkable(game, tx, ty)) return false;
-    if (mod.canEnter && !mod.canEnter(game, tx, ty)) return false;
+    // the tile you're already standing on is always leavable, even if it's
+    // blocked furniture (e.g. a toddler starting out on top of their crib) —
+    // otherwise a sub-tile step that rounds back to your own tile can never
+    // pass the walkability check and movement locks up entirely
+    const onOwnTile = tx === Math.round(p.x) && ty === Math.round(p.y);
+    if (!onOwnTile) {
+      if (!isWalkable(game, tx, ty)) return false;
+      if (mod.canEnter && !mod.canEnter(game, tx, ty)) return false;
+    }
     return true;
   };
   if (tryAxis(p.x + vx, p.y)) p.x += vx;

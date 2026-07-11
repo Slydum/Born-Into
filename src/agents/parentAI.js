@@ -11,6 +11,7 @@ import { getBuilding } from '../world/townGen.js';
 import { furnitureIn } from '../world/houseGen.js';
 import { relScore, adjustRel, getRel } from './relationships.js';
 import { logMsg, toast } from '../ui/hud.js';
+import { neededFurniture, findFreeSpot, addFurniture, FURNITURE_COST, furnitureLabel } from '../world/furnish.js';
 
 const AI_TICK = 1.0;
 
@@ -80,6 +81,15 @@ function decideParent(game, agent) {
   }
   if (hh.fridge < 30 && hh.money >= 30 && cooled(game, agent, 'grocery') && !isNight(st.hour)) {
     cands.push({ id: 'grocery', score: 34 + (30 - hh.fridge) });
+  }
+  if (home && isHome(game, agent) && cooled(game, agent, 'furnish') && !isNight(st.hour)) {
+    const need = neededFurniture(game, home, hh);
+    if (need.length) {
+      const cost = FURNITURE_COST[need[0]];
+      if (hh.money >= cost + 40) {
+        cands.push({ id: 'furnish', score: 22 + t.workEthic * 0.15, target: need[0] });
+      }
+    }
   }
   if (baby) {
     const care = baby.careLevel;
@@ -154,6 +164,26 @@ function startParentAction(game, agent, pick, hh, home) {
     case 'goHome': {
       if (home) gotoTile(game, agent, home.door.x, home.door.y - 1) || gotoTile(game, agent, home.exit.x, home.exit.y);
       agent.activity = { type: 'goHome', until: 0 };
+      break;
+    }
+    case 'furnish': {
+      const type = pick.target;
+      const cost = FURNITURE_COST[type];
+      setCool(game, agent, 'furnish', 240);
+      const spot = findFreeSpot(game, home);
+      if (spot && hh.money >= cost) {
+        hh.money -= cost;
+        addFurniture(game, home, type, spot);
+        const playerAg = agentById(st, st.playerId);
+        if (playerAg && playerAg.householdId === hh.id) {
+          if (type === 'kidbed') {
+            logMsg(game, `${agent.name} scrapes together $${cost} for a real bed. You have your own bed now.`, true);
+          } else {
+            logMsg(game, `${agent.name} brings home ${furnitureLabel(type)} — the house feels a little more put together.`, true);
+          }
+        }
+      }
+      agent.activity = { type: 'idle', until: st.simSec + 2 };
       break;
     }
     default: {

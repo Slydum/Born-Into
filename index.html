@@ -44,6 +44,31 @@
   #panel h3 { margin:0 0 4px; color:var(--accent); font-size:14px; }
   #panel .desc { color:var(--dim); margin-bottom:8px; line-height:1.4; }
   #panel .abtn { display:block; width:100%; margin-top:5px; text-align:left; }
+
+  /* virtual d-pad, shown only on touch/small screens */
+  #dpad { display:none; bottom:10px; left:10px; width:140px; height:140px; }
+  #dpad .dbtn {
+    position:absolute; width:46px; height:46px; border-radius:10px; display:flex;
+    align-items:center; justify-content:center; background:rgba(38,43,54,.92);
+    border:1px solid #444c5c; color:var(--text); font-size:18px; touch-action:none; user-select:none;
+  }
+  #dpad .up { top:0; left:47px; } #dpad .down { top:94px; left:47px; }
+  #dpad .left { top:47px; left:0; } #dpad .right { top:47px; left:94px; }
+  #dpad .dbtn:active { background:rgba(232,176,75,.35); border-color:var(--accent); }
+  #game { touch-action:none; }
+
+  @media (max-width:760px), (pointer:coarse) {
+    #dpad { display:block; }
+    #topbar { font-size:11px; padding:4px 6px; gap:5px 10px; }
+    #stats { width:42vw; max-width:175px; font-size:10.5px; padding:6px; }
+    #log { left:auto; right:8px; width:40vw; max-height:100px; font-size:10px; bottom:160px; }
+    #hint { display:none; }
+    #actions { left:158px; right:8px; bottom:10px; }
+    .abtn { padding:9px 11px; font-size:12.5px; }
+    #panel { width:88vw; right:6vw; }
+    #modal { width:92vw; padding:14px 16px; max-height:78vh; }
+    #modal .opt { padding:11px 12px; }
+  }
 </style>
 </head>
 <body>
@@ -55,6 +80,12 @@
   <div class="ui" id="actions"></div>
   <div class="ui" id="toast"></div>
   <div class="ui" id="panel"></div>
+  <div class="ui" id="dpad">
+    <button class="dbtn up" data-dx="0" data-dy="-1">▲</button>
+    <button class="dbtn left" data-dx="-1" data-dy="0">◀</button>
+    <button class="dbtn right" data-dx="1" data-dy="0">▶</button>
+    <button class="dbtn down" data-dx="0" data-dy="1">▼</button>
+  </div>
   <div id="modal-wrap"><div id="modal"></div></div>
   <script type="module" src="src/main.js"></script>
 </body>

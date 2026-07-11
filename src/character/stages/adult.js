@@ -13,6 +13,7 @@ import { playerStats, addStat } from '../stats.js';
 import { traitMod } from '../traits.js';
 import { logMsg, toast } from '../../ui/hud.js';
 import { startPregnancy } from '../../family/pregnancy.js';
+import { neededFurniture, findFreeSpot, addFurniture, FURNITURE_COST, furnitureLabel } from '../../world/furnish.js';
 
 export const canMove = true;
 
@@ -91,6 +92,29 @@ export function actions(game) {
         }
       },
     });
+  }
+
+  // furnish the house for your own kids, or fix it up when there's spare
+  // money — the same thing any parent household does automatically, but
+  // you get to choose when.
+  const home = homeOf(game, p);
+  if (home && hh) {
+    for (const type of neededFurniture(game, home, hh)) {
+      const cost = FURNITURE_COST[type];
+      acts.push({
+        label: `${type === 'kidbed' ? 'Buy a bed for the kids' : 'Redecorate — add a bookshelf'} ($${cost})`,
+        disabled: hh.money < cost,
+        fn: () => {
+          const spot = findFreeSpot(game, home);
+          if (!spot) { logMsg(game, "There's no room left to put it."); return; }
+          hh.money -= cost;
+          addFurniture(game, home, type, spot);
+          logMsg(game, type === 'kidbed'
+            ? 'You buy a proper bed for the kids.'
+            : `You bring home ${furnitureLabel(type)}. The house looks better for it.`, true);
+        },
+      });
+    }
   }
   return acts;
 }

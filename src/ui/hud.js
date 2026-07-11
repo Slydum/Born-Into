@@ -64,6 +64,12 @@ export function updateHud(game) {
   for (const el of els.top.querySelectorAll('.spd')) {
     el.onclick = () => { st.speed = +el.dataset.spd; };
   }
+  const nameEl = els.top.querySelector('b');
+  if (nameEl && game.ui.showSelfInfo) {
+    nameEl.style.cursor = 'pointer';
+    nameEl.title = 'Tap to see yourself';
+    nameEl.onclick = () => game.ui.showSelfInfo();
+  }
 
   // stat bars
   const bars = STAGE_BARS[st.playerData.stage] || STAGE_BARS.adult;

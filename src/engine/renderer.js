@@ -18,6 +18,13 @@ export function initRenderer(canvas) {
   resize();
 }
 
+// Convert canvas-local pixel coordinates (e.g. from a click/tap event) into
+// world tile coordinates, using the camera position from the last render().
+export function screenToWorld(sx, sy) {
+  const ts = TILE * SCALE;
+  return { x: (sx + cam.x) / ts, y: (sy + cam.y) / ts };
+}
+
 function spriteKindFor(age) {
   if (age < 2) return 'baby';
   if (age < 5) return 'toddler';

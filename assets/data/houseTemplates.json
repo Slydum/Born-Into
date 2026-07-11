@@ -1,0 +1,44 @@
+{
+  "legend": {
+    "W": "wall", ".": "floor", "D": "door", "C": "crib", "B": "bed", "b": "kidbed",
+    "K": "stove", "R": "fridge", "T": "table", "V": "tv", "X": "toybox", "H": "stairs", "O": "shelf"
+  },
+  "tiers": [
+    {
+      "name": "Cramped Bungalow",
+      "rows": [
+        "WWWWWWWW",
+        "WKR..TBW",
+        "W.....CW",
+        "W.X...bW",
+        "WV.....W",
+        "WWWDWWWW"
+      ]
+    },
+    {
+      "name": "Family Home",
+      "rows": [
+        "WWWWWWWWWWW",
+        "WKR...WB.CW",
+        "W.T...Wb..W",
+        "W.....W...W",
+        "W.X.......W",
+        "WV......H.W",
+        "WWWWDWWWWWW"
+      ]
+    },
+    {
+      "name": "Hillside Manor",
+      "rows": [
+        "WWWWWWWWWWWWW",
+        "WKR....WB..CW",
+        "W.T....Wb..bW",
+        "W......W....W",
+        "W.OO........W",
+        "W.X....O....W",
+        "WV.......H..W",
+        "WWWWWWDWWWWWW"
+      ]
+    }
+  ]
+}

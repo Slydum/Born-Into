@@ -1,0 +1,10 @@
+{
+  "name": "born-into",
+  "version": "0.1.0",
+  "description": "A generational life-simulation game: live one life from birth to death, then continue as one of your children.",
+  "type": "module",
+  "scripts": {
+    "start": "npx http-server -p 8000 -c-1 ."
+  },
+  "license": "MIT"
+}

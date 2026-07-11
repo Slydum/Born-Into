@@ -1,0 +1,133 @@
+[
+  {
+    "id": "grandma", "stage": "baby", "weight": 3,
+    "title": "A Visitor", "text": "An older relative visits and holds you for the whole afternoon, humming.",
+    "auto": { "effects": { "stats": { "bonding": 6, "stimulation": 4 } }, "log": "A relative's visit soothed you." }
+  },
+  {
+    "id": "fever", "stage": "baby", "weight": 2,
+    "title": "Fever", "text": "You run a worrying fever in the night.",
+    "auto": { "effects": { "stats": { "health": -6, "stressExp": 4 } }, "log": "You ran a fever. It passed, but it took something out of you." }
+  },
+  {
+    "id": "mobile", "stage": "baby", "weight": 2,
+    "title": "The Mobile", "text": "Someone hangs a mobile of paper birds over the crib. You watch it for hours.",
+    "auto": { "effects": { "stats": { "stimulation": 7 } }, "log": "The paper birds are the best thing you have ever seen." }
+  },
+  {
+    "id": "wordfirst", "stage": "toddler", "weight": 3,
+    "title": "First Word", "text": "You say your first real word at dinner. The room stops.",
+    "auto": { "effects": { "stats": { "bonding": 5, "curiosity": 5 } }, "log": "Your first word! The whole house lit up." }
+  },
+  {
+    "id": "cornertable", "stage": "toddler", "weight": 2,
+    "title": "The Corner Table", "text": "The coffee table is exactly forehead height.",
+    "auto": { "effects": { "stats": { "health": -3 } }, "log": "You met the corner of the table. The table won." }
+  },
+  {
+    "id": "picturebook", "stage": "toddler", "weight": 2,
+    "title": "Picture Book", "text": "You find a picture book and 'read' it aloud, upside down, for an hour.",
+    "auto": { "effects": { "stats": { "curiosity": 7, "stimulation": 4 } }, "log": "Books, it turns out, are wonderful." }
+  },
+  {
+    "id": "classproject", "stage": "child", "weight": 3,
+    "title": "Class Project", "text": "A big class project is due. Your partner did nothing.",
+    "choices": [
+      { "label": "Do it all yourself", "effects": { "stats": { "grades": 6, "stressExp": 4 } } },
+      { "label": "Turn in half a project", "effects": { "stats": { "grades": -5 } } },
+      { "label": "Tell the teacher", "effects": { "stats": { "grades": 3, "social": -4 } } }
+    ]
+  },
+  {
+    "id": "straydog", "stage": "child", "weight": 2,
+    "title": "The Stray", "text": "A scruffy dog follows you halfway home, hopeful.",
+    "choices": [
+      { "label": "Feed it your sandwich", "effects": { "stats": { "social": 3 }, "flag": { "kindHeart": true } } },
+      { "label": "Shoo it away", "effects": {} }
+    ]
+  },
+  {
+    "id": "dare", "stage": "child", "weight": 2, "riskEvent": true,
+    "title": "The Dare", "text": "Kids at the park dare you to jump from the top of the climbing frame.",
+    "choices": [
+      { "label": "Jump", "outcomes": [
+        { "p": 0.6, "text": "You stick the landing. Legend status achieved.", "effects": { "stats": { "social": 8 }, "flag": { "hazardSurvivor": true } } },
+        { "p": 0.4, "text": "You land wrong. Something crunches in your wrist.", "effects": { "stats": { "health": -14 }, "flag": { "hazardSurvivor": true }, "log": "A broken wrist. Six weeks in a cast." } }
+      ] },
+      { "label": "Climb down", "effects": { "stats": { "social": -3 } } }
+    ]
+  },
+  {
+    "id": "spellingbee", "stage": "child", "weight": 2, "cond": { "stat": "grades", "gte": 60 },
+    "title": "Spelling Bee", "text": "You're picked for the school spelling bee.",
+    "choices": [
+      { "label": "Practice hard", "outcomes": [
+        { "p": 0.6, "text": "You win! A small trophy, a big feeling.", "effects": { "stats": { "grades": 8, "social": 5 } } },
+        { "p": 0.4, "text": "You freeze on 'rhythm'. It stings.", "effects": { "stats": { "grades": 3, "stressExp": 3 } } }
+      ] },
+      { "label": "Wing it", "effects": { "stats": { "social": 2 } } }
+    ]
+  },
+  {
+    "id": "party", "stage": "teen", "weight": 3, "riskEvent": true,
+    "title": "House Party", "text": "Word spreads: parents out of town, whole grade invited. Tonight.",
+    "choices": [
+      { "label": "Go", "outcomes": [
+        { "p": 0.5, "text": "A great night. You feel ten feet tall.", "effects": { "stats": { "social": 10, "rebellion": 6 } } },
+        { "p": 0.3, "text": "Someone passes you a bottle. You drink more than you meant to.", "effects": { "stats": { "social": 5, "rebellion": 8, "addiction": 15 }, "flag": { "addictionSeed": true } } },
+        { "p": 0.2, "text": "The cops break it up. Your name gets taken down.", "effects": { "stats": { "rebellion": 8, "stressExp": 6 }, "flag": { "policeContact": true } } }
+      ] },
+      { "label": "Stay home", "effects": { "stats": { "social": -4 }, "flag": { "playedItSafe": true } } }
+    ]
+  },
+  {
+    "id": "joyride", "stage": "teen", "weight": 2, "riskEvent": true, "cond": { "stat": "rebellion", "gte": 25 },
+    "title": "The Joyride", "text": "A friend 'borrowed' an older brother's car. There's a seat for you.",
+    "choices": [
+      { "label": "Get in", "outcomes": [
+        { "p": 0.55, "text": "Windows down, music up. You feel infinite.", "effects": { "stats": { "rebellion": 10, "social": 6 }, "flag": { "tookBigRisks": true } } },
+        { "p": 0.3, "text": "He clips a mailbox and you all get marched home by a cop.", "effects": { "stats": { "rebellion": 6 }, "flag": { "policeContact": true, "record": true } } },
+        { "p": 0.15, "text": "He takes the bend by the river too fast.", "effects": { "stats": { "health": -45 }, "flag": { "seriousInjury": true, "tookBigRisks": true }, "log": "The crash. You wake up in the hospital and nothing is the same." } }
+      ] },
+      { "label": "Wave them off", "effects": { "flag": { "playedItSafe": true } } }
+    ]
+  },
+  {
+    "id": "examweek", "stage": "teen", "weight": 3,
+    "title": "Exam Week", "text": "Finals loom. Everyone's cramming.",
+    "choices": [
+      { "label": "Study all week", "effects": { "stats": { "grades": 8, "stressExp": 4 } } },
+      { "label": "Balance it out", "effects": { "stats": { "grades": 4 } } },
+      { "label": "Blow it off", "effects": { "stats": { "grades": -7, "rebellion": 4 } } }
+    ]
+  },
+  {
+    "id": "promotion", "stage": "adult", "weight": 3, "cond": { "flag": "employed" },
+    "title": "An Opening", "text": "Your manager quits. The role is open, if you push for it.",
+    "choices": [
+      { "label": "Go for it", "outcomes": [
+        { "p": 0.5, "text": "You get it. More money, more headaches.", "effects": { "promotion": true } },
+        { "p": 0.5, "text": "They hire externally. Figures.", "effects": { "needs": { "stress": 10 } } }
+      ] },
+      { "label": "Stay in your lane", "effects": {} }
+    ]
+  },
+  {
+    "id": "layoffs", "stage": "adult", "weight": 1, "cond": { "flag": "employed" },
+    "title": "Layoffs", "text": "The company announces cuts. Your whole floor goes quiet.",
+    "auto": { "effects": { "layoffRisk": true }, "log": "Layoffs at work. You survive the cut, but the mood is grim." }
+  },
+  {
+    "id": "oldfriend", "stage": "adult", "weight": 2,
+    "title": "A Familiar Face", "text": "Someone from your school days recognizes you at the grocery store.",
+    "auto": { "effects": { "needs": { "mood": 12 } }, "log": "You catch up with an old friend. It's good for the soul." }
+  },
+  {
+    "id": "healthscare", "stage": "adult", "weight": 2, "minAge": 40,
+    "title": "The Checkup", "text": "The doctor frowns at your chart longer than you'd like.",
+    "choices": [
+      { "label": "Follow the regimen ($60)", "effects": { "money": -60, "stats": { "health": 8 } } },
+      { "label": "Ignore it", "effects": { "stats": { "health": -8 } } }
+    ]
+  }
+]

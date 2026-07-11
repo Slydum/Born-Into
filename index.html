@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Born Into</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%2314161c'/><rect x='4' y='2' width='8' height='6' fill='%23e8b88f'/><rect x='3' y='8' width='10' height='6' fill='%23b04848'/></svg>">
+<style>
+  :root { --bg:#14161c; --panel:#1e222b; --panel2:#262b36; --text:#e8e6df; --dim:#9aa0ac; --accent:#e8b04b; --bad:#d05555; --good:#6fbf73; }
+  * { box-sizing: border-box; }
+  html,body { margin:0; padding:0; background:var(--bg); color:var(--text); font-family: "Courier New", monospace; overflow:hidden; height:100%; }
+  #game { display:block; image-rendering: pixelated; image-rendering: crisp-edges; background:#0e1013; position:absolute; inset:0; width:100%; height:100%; }
+  .ui { position:absolute; z-index:10; }
+  #topbar { top:0; left:0; right:0; display:flex; gap:14px; align-items:center; padding:6px 10px; background:rgba(20,22,28,.88); border-bottom:1px solid #333a46; font-size:13px; flex-wrap:wrap; }
+  #topbar b { color:var(--accent); }
+  #topbar .spd { cursor:pointer; padding:1px 7px; border:1px solid #444c5c; border-radius:3px; color:var(--dim); user-select:none; }
+  #topbar .spd.on { color:var(--text); background:#39415232; border-color:var(--accent); }
+  #stats { top:44px; left:8px; width:190px; background:rgba(30,34,43,.92); border:1px solid #333a46; border-radius:6px; padding:8px; font-size:12px; }
+  .bar { margin:5px 0; }
+  .bar .lbl { display:flex; justify-content:space-between; color:var(--dim); font-size:11px; }
+  .bar .tr { height:7px; background:#11131a; border-radius:3px; overflow:hidden; margin-top:2px; }
+  .bar .fl { height:100%; border-radius:3px; transition:width .3s; }
+  #traits { margin-top:6px; font-size:11px; color:var(--dim); line-height:1.5; }
+  #traits .t { display:inline-block; margin:1px 2px 1px 0; padding:0 5px; border-radius:3px; background:#333a46; color:var(--text); }
+  #traits .t.pos { background:#2c4a30; } #traits .t.neg { background:#4a2c2c; }
+  #log { bottom:56px; left:8px; width:330px; max-height:150px; overflow:hidden; font-size:11px; color:var(--dim); pointer-events:none; display:flex; flex-direction:column; justify-content:flex-end; }
+  #log div { background:rgba(20,22,28,.75); padding:2px 6px; border-radius:3px; margin-top:2px; }
+  #log div.hot { color:var(--accent); }
+  #actions { bottom:8px; left:8px; right:8px; display:flex; gap:6px; flex-wrap:wrap; }
+  .abtn { cursor:pointer; background:var(--panel2); border:1px solid #444c5c; color:var(--text); font-family:inherit; font-size:12px; padding:7px 12px; border-radius:5px; }
+  .abtn:hover { border-color:var(--accent); }
+  .abtn:disabled { opacity:.4; cursor:default; }
+  .abtn .k { color:var(--accent); }
+  #hint { bottom:56px; right:8px; font-size:12px; color:var(--dim); background:rgba(20,22,28,.8); padding:4px 8px; border-radius:4px; max-width:260px; text-align:right; }
+  #toast { top:70px; left:50%; transform:translateX(-50%); background:var(--panel2); border:1px solid var(--accent); padding:8px 16px; border-radius:6px; font-size:13px; opacity:0; transition:opacity .3s; pointer-events:none; max-width:70%; text-align:center; }
+  #modal-wrap { position:absolute; inset:0; z-index:50; background:rgba(10,11,14,.72); display:none; align-items:center; justify-content:center; }
+  #modal { background:var(--panel); border:1px solid #4a5264; border-radius:8px; padding:18px 20px; width:min(480px, 92vw); max-height:80vh; overflow-y:auto; }
+  #modal h2 { margin:0 0 8px; font-size:16px; color:var(--accent); }
+  #modal p { font-size:13px; line-height:1.5; color:var(--text); white-space:pre-wrap; }
+  #modal .opt { display:block; width:100%; text-align:left; margin-top:8px; cursor:pointer; background:var(--panel2); border:1px solid #444c5c; color:var(--text); font-family:inherit; font-size:13px; padding:9px 12px; border-radius:5px; }
+  #modal .opt:hover { border-color:var(--accent); }
+  #modal .opt .sub { display:block; color:var(--dim); font-size:11px; margin-top:2px; }
+  #panel { top:44px; right:8px; width:250px; background:rgba(30,34,43,.95); border:1px solid #4a5264; border-radius:6px; padding:10px; font-size:12px; display:none; }
+  #panel h3 { margin:0 0 4px; color:var(--accent); font-size:14px; }
+  #panel .desc { color:var(--dim); margin-bottom:8px; line-height:1.4; }
+  #panel .abtn { display:block; width:100%; margin-top:5px; text-align:left; }
+</style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div class="ui" id="topbar"></div>
+  <div class="ui" id="stats"></div>
+  <div class="ui" id="log"></div>
+  <div class="ui" id="hint"></div>
+  <div class="ui" id="actions"></div>
+  <div class="ui" id="toast"></div>
+  <div class="ui" id="panel"></div>
+  <div id="modal-wrap"><div id="modal"></div></div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
